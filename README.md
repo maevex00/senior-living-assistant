@@ -2,6 +2,8 @@
 ### AI-Powered Workflow Automation for Assisted Living Advisors
 **Simon Business School — MSAIB Capstone | Built for Assisted Living Locators**
 
+🔗 **[Live Demo](https://maevex00-senior-living-assistant-app-j7p7i1.streamlit.app/)** — Toggle "Demo Mode" in the sidebar, no credentials needed.
+
 ---
 
 ## Overview
