@@ -1,0 +1,10 @@
+Flask>=3.1,<4
+Flask-Cors>=6,<7
+pydantic>=2.11,<3
+pandas>=2.2,<3.1
+google-genai>=1.0,<3
+gspread>=6.2,<7
+google-auth>=2.27,<3
+geopy>=2.4,<3
+openpyxl>=3.1,<4
+gunicorn>=23,<26; sys_platform != 'win32'

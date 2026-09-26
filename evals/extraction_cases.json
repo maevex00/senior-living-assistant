@@ -1,0 +1,8 @@
+[
+  {"id":"assisted-budget","text":"My mother needs assisted living near Rochester, NY. Her maximum monthly budget is $4,500. She needs to move immediately.","expected":{"care_level":"Assisted Living","max_budget":4500,"preferred_locations":["Rochester, NY"],"move_in_window":"Immediate"}},
+  {"id":"memory-budget","text":"We need Memory Care in Brighton, NY, up to $6,000 per month. Timing is flexible.","expected":{"care_level":"Memory Care","max_budget":6000,"preferred_locations":["Brighton, NY"],"move_in_window":"Flexible"}},
+  {"id":"independent-k","text":"Independent living in Rochester, NY. Budget is 3.5k monthly. We'd like to move in 2 months.","expected":{"care_level":"Independent Living","max_budget":3500,"preferred_locations":["Rochester, NY"],"move_in_window":"Near-term"}},
+  {"id":"unknown-facts","text":"I am gathering information for a family member. We haven't decided on care, area, budget or timing.","expected":{"care_level":null,"max_budget":null,"preferred_locations":[],"move_in_window":null}},
+  {"id":"range","text":"Assisted living, monthly budget $3,000 to $4,500, near 14618. Move immediately.","expected":{"care_level":"Assisted Living","max_budget":4500,"preferred_locations":["14618"],"move_in_window":"Immediate"}},
+  {"id":"no-clinical-inference","text":"My father is 78 and forgetful. We have not chosen a care level or set a budget. We'd prefer Brighton, NY. Timing is flexible.","expected":{"care_level":null,"max_budget":null,"preferred_locations":["Brighton, NY"],"move_in_window":"Flexible"}}
+]

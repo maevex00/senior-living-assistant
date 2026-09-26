@@ -3,11 +3,11 @@ import pandas as pd
 
 def assign_priority(row) -> int:
     """Return priority tier: 1=contracted, 2=placement partner, 3=other."""
-    c = str(row.get("Contract (w rate)?", "")).lower()
-    p = str(row.get("Work with Placement?", "")).lower()
-    if c not in ["no", "nan", ""]:
+    c = str(row.get("Contract (w rate)?", "")).strip().lower()
+    p = str(row.get("Work with Placement?", "")).strip().lower()
+    if c not in ["no", "nan", "", "none", "unknown"]:
         return 1
-    if c == "no" and p == "yes":
+    if p == "yes":
         return 2
     return 3
 
