@@ -1,2 +1,43 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#183f36"/><title>Haven · Senior Living Advisor</title></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#183f36" />
+    <title>Haven · Senior Living Advisor</title>
+  </head>
+  <body>
+    <div id="root">
+      <main data-startup style="max-width: 40rem; margin: 15vh auto; padding: 2rem; font-family: system-ui; color: #183f36">
+        <h1>Haven</h1>
+        <p id="startup-status" role="status">Loading your advisor workspace…</p>
+        <noscript>Please enable JavaScript to use the advisor workspace.</noscript>
+      </main>
+    </div>
+    <script>
+      (() => {
+        const showFailure = (detail) => {
+          const status = document.getElementById("startup-status");
+          if (status) {
+            status.textContent = "The workspace could not start. Please reload this page. " + detail;
+          }
+        };
+        window.addEventListener("error", (event) => {
+          if (event.target instanceof HTMLScriptElement) {
+            showFailure("A required application file could not be loaded.");
+          } else if (event.message) {
+            showFailure(event.message);
+          }
+        }, true);
+        window.setTimeout(() => {
+          const status = document.getElementById("startup-status");
+          if (status && status.textContent.startsWith("Loading")) {
+            showFailure("Loading took longer than expected. Check your connection and try again.");
+          }
+        }, 20000);
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
