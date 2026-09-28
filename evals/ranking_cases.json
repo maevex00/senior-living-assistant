@@ -1,0 +1,10 @@
+[
+  {"id":"budget-and-care","profile":{"care_level":"Assisted Living","max_budget":4000,"preferred_locations":["14618"]},"communities":[{"community_id":"eligible","monthly_fee":4000},{"community_id":"over","monthly_fee":4001},{"community_id":"wrong-care","care_levels":["Memory Care"]}],"expected_ids":["eligible"]},
+  {"id":"enhanced-required","profile":{"care_level":"Enhanced Assisted Living","max_budget":5000,"preferred_locations":["14618"]},"communities":[{"community_id":"yes","enhanced":true},{"community_id":"no","enhanced":false},{"community_id":"unknown"}],"expected_ids":["yes"]},
+  {"id":"distance-over-business","profile":{"care_level":"AL","max_budget":5000,"preferred_locations":["14618"]},"communities":[{"community_id":"near","coordinates":[43.1,-77.5],"business_tier":3},{"community_id":"far","coordinates":[44.1,-77.5],"business_tier":1}],"expected_ids":["near","far"]},
+  {"id":"business-tie","profile":{"care_level":"AL","max_budget":5000,"preferred_locations":["14618"]},"communities":[{"community_id":"other","business_tier":3},{"community_id":"partner","business_tier":2},{"community_id":"contract","business_tier":1}],"expected_ids":["contract","partner","other"]},
+  {"id":"urgent-availability","profile":{"care_level":"AL","max_budget":5000,"preferred_locations":["14618"],"move_in_window":"Immediate"},"communities":[{"community_id":"wait","wait_months":6,"business_tier":1},{"community_id":"now","wait_months":0,"business_tier":3}],"expected_ids":["now","wait"]},
+  {"id":"missing-price-fail-closed","profile":{"care_level":"AL","max_budget":5000,"preferred_locations":["14618"]},"communities":[{"community_id":"unknown","monthly_fee":null}],"expected_ids":[]},
+  {"id":"missing-intake","profile":{"care_level":"AL"},"communities":[{"community_id":"otherwise-eligible"}],"expected_ids":[]},
+  {"id":"stable-id-tie","profile":{"care_level":"AL","max_budget":5000,"preferred_locations":["14618"]},"communities":[{"community_id":"Z"},{"community_id":"A"}],"expected_ids":["A","Z"]}
+]

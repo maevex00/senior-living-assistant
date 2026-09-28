@@ -1,15 +1,29 @@
 import json
 import pytest
 from unittest.mock import MagicMock
-from src.ai_pipeline import _regex_budget_fallback, extract_preferences, batch_generate_explanations
+from src.ai_pipeline import _regex_budget_fallback, GeminiService
+from backend.models import ClientProfile
+
+
+def extract_preferences(client, transcript):
+    return GeminiService({"GEMINI_MODEL": "gemini-2.5-flash"}, client).extract(transcript)[0].model_dump()
+
+
+def batch_generate_explanations(client, communities, prefs):
+    rows = [{"community_id": str(i), "rank": i+1, "final_score": 90, "reasons": ["Within budget"]} for i, _ in enumerate(communities)]
+    mapped, _, _ = GeminiService({"GEMINI_MODEL": "gemini-2.5-flash", "DEMO_MODE": False}, client).explain(ClientProfile(), rows)
+    return [mapped[str(i)] for i in range(len(rows))]
 
 
 def _mock_client(response_content: str) -> MagicMock:
-    """Create a mock OpenAI client that returns a fixed JSON string."""
+    """Mock the Google GenAI SDK with structured responses."""
     client = MagicMock()
-    msg = MagicMock()
-    msg.content = response_content
-    client.chat.completions.create.return_value.choices = [MagicMock(message=msg)]
+    data = json.loads(response_content)
+    if isinstance(data, list):
+        data = {"explanations": [{"community_id": str(i), "explanation": text} for i, text in enumerate(data)]}
+    elif "explanations" in data:
+        data = {"explanations": [{"community_id": str(i), "explanation": text} for i, text in enumerate(data["explanations"])]}
+    client.models.generate_content.return_value.text = json.dumps(data)
     return client
 
 
@@ -47,39 +61,23 @@ class TestRegexBudgetFallback:
 
 class TestExtractPreferences:
     def _make_prefs_json(self, **overrides) -> str:
-        prefs = {
-            "name_of_patient": "John Doe",
-            "age_of_patient": "80",
-            "injury_or_reason": "Hip fracture",
-            "primary_contact_information": {"name": "Jane", "phone_number": "555-1234", "email": ""},
-            "mentally": "sharp",
-            "care_level": "Assisted Living",
-            "preferred_location": ["Rochester, NY"],
-            "enhanced": "no",
-            "enriched": "no",
-            "move_in_window": "Immediate (0-1 months)",
-            "max_budget": 3000,
-            "pet_friendly": "no",
-            "tour_availability": [],
-            "other_keywords": {},
-        }
+        prefs = {"patient_name": "John Doe", "age": 80, "care_level": "Assisted Living", "max_budget": 3000,
+                 "preferred_locations": ["Rochester, NY"], "move_in_window": "Immediate"}
         prefs.update(overrides)
         return json.dumps(prefs)
 
     def test_returns_dict_with_core_keys(self):
         client = _mock_client(self._make_prefs_json())
         result = extract_preferences(client, "sample transcript")
-        assert "name_of_patient" in result
+        assert "patient_name" in result
         assert "care_level" in result
         assert "max_budget" in result
 
     def test_passes_transcript_to_api(self):
         client = _mock_client(self._make_prefs_json())
         extract_preferences(client, "specific transcript text")
-        call_args = client.chat.completions.create.call_args
-        messages = call_args.kwargs.get("messages") or call_args.args[0]
-        user_content = next(m["content"] for m in messages if m["role"] == "user")
-        assert "specific transcript text" in user_content
+        call_args = client.models.generate_content.call_args
+        assert "specific transcript text" in call_args.kwargs["contents"]
 
     def test_regex_fallback_activates_when_budget_null(self):
         prefs_no_budget = self._make_prefs_json(max_budget=None)
@@ -92,11 +90,11 @@ class TestExtractPreferences:
         result = extract_preferences(client, "Her budget is $9,000 per month.")
         assert result["max_budget"] == 3000
 
-    def test_uses_json_object_response_format(self):
+    def test_uses_structured_json_response(self):
         client = _mock_client(self._make_prefs_json())
         extract_preferences(client, "transcript")
-        call_kwargs = client.chat.completions.create.call_args.kwargs
-        assert call_kwargs.get("response_format") == {"type": "json_object"}
+        call_kwargs = client.models.generate_content.call_args.kwargs
+        assert call_kwargs["config"].response_mime_type == "application/json"
 
 
 # ── batch_generate_explanations ───────────────────────────────────────────────
@@ -125,7 +123,7 @@ class TestBatchGenerateExplanations:
         result = batch_generate_explanations(client, self._make_communities(3), {})
         assert len(result) == 3
 
-    def test_handles_direct_list_response(self):
+    def test_maps_explanation_ids_to_original_order(self):
         client = _mock_client('["Sentence one.", "Sentence two."]')
         result = batch_generate_explanations(client, self._make_communities(2), {})
         assert len(result) == 2
@@ -133,10 +131,10 @@ class TestBatchGenerateExplanations:
     def test_single_api_call_for_multiple_communities(self):
         client = _mock_client('{"explanations": ["A.", "B.", "C.", "D.", "E."]}')
         batch_generate_explanations(client, self._make_communities(5), {})
-        assert client.chat.completions.create.call_count == 1
+        assert client.models.generate_content.call_count == 1
 
-    def test_uses_json_object_response_format(self):
+    def test_uses_structured_json_response(self):
         client = _mock_client('{"explanations": ["A."]}')
         batch_generate_explanations(client, self._make_communities(1), {})
-        call_kwargs = client.chat.completions.create.call_args.kwargs
-        assert call_kwargs.get("response_format") == {"type": "json_object"}
+        call_kwargs = client.models.generate_content.call_args.kwargs
+        assert call_kwargs["config"].response_mime_type == "application/json"

@@ -62,4 +62,4 @@ ALL-015,Independent Living,2-Bedroom,no,no,2600,no,yes,14642,None
 
 
 def load_demo_communities() -> pd.DataFrame:
-    return pd.read_csv(StringIO(_DEMO_CSV))
+    return pd.read_csv(StringIO(_DEMO_CSV), keep_default_na=False)

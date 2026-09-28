@@ -1,0 +1,14 @@
+{
+  "version": "2.0",
+  "weights": {
+    "care_fit": 0.28,
+    "affordability": 0.22,
+    "distance": 0.20,
+    "availability": 0.15,
+    "enhanced_enriched": 0.07,
+    "pet_fit": 0.04,
+    "apartment_fit": 0.04
+  },
+  "distance_limit_miles": 50,
+  "business_policy": "tie_break_only"
+}

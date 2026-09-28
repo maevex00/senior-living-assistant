@@ -1,0 +1,11 @@
+.git
+.venv
+**/node_modules
+**/dist
+**/__pycache__
+.cache
+.env*
+**/*service*account*.json
+.streamlit
+**/test-results
+**/playwright-report
